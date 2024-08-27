@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>In & Out</title>
+    <link rel="stylesheet" href="/menu/style.css">
+</head>
+<body>
+<div class="header" th:include=".common/menu :: header"></div>
+
+<div class="container">
+
+    <div class="sidebar" th:include=".common/menu :: sidebar"></div>
+    <div class="content">
+        <div class="content-header">
+            <h2>수입</h2>
+        </div>
+        <form name = "incomeForm">
+            <table>
+                <thead>
+                <tr>
+                    <th>수정/삭제 체크</th>
+                    <th>날짜</th>
+                    <th>분류</th>
+                    <th>수입내역</th>
+                    <th>금액</th>
+                    <th>메모</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="income: ${incomeDTOList}">
+                    <td><input type="checkbox" name="incomeId" th:value="${income.incomeId}" ></td>
+                    <td th:text="${income.regDt}"></td>
+                    <td th:text="${income.incomeCategoryName}"></td>
+                    <td th:text="${income.incomeContent}"></td>
+                    <td th:text="${income.price}"></td>
+                    <td th:text="${income.memo}"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td><input type="date" name="regDt"></td>
+                    <td>
+                        <select name="incomeCategoryId">
+                            <option value="11">주수입</option>
+                            <option value="22">부수입</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="incomeContent"></td>
+                    <td><input type="text" name="price"></td>
+                    <td><input type="text" name="memo"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="action-buttons">
+                <button class="save" onclick="save();">저장</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function save(){
+        alert('저장');
+        document.incomeForm.action = "/income/write";
+        document.incomeForm.method = "post";
+        document.incomeForm.submit();
+    }
+
+    function update() {
+    const checkboxes = document.querySelectorAll('input[name="incomeId"]');
+    let incomeId = null;
+
+    for (let checkbox of checkboxes) {
+        if (checkbox.checked) {
+            incomeId = checkbox.value;
+            break;
+        }
+    }
+
+    if (incomeId) {
+
+        location.href = "/income/update?incomeId=${incomeId}";
+    } else {
+        alert('체크된 항목이 없습니다.');
+    }
+
+  }
+
+   document.addEventListener('DOMContentLoaded', function () {
+    const searchedDate = /*[[${searchedDate}]]*/ '[[${searchedDate}]]'; // 서버에서 전달된 searchedDate를 가져옴
+
+    if (searchedDate) {
+      const [year, month] = searchedDate.split('-');
+      currentYear = parseInt(year, 10);
+      currentMonth = parseInt(month, 10);
+    }
+
+    updateMonthYearDisplay();
+  });
+
+  function updateMonthYearDisplay() {
+    const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+    document.getElementById('currentMonthYear').innerText = `${monthNames[currentMonth - 1]} ${currentYear}`;
+    
+  }
+</script>
+</body>
+</html>

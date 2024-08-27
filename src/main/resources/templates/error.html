@@ -1,0 +1,13 @@
+<h4 xmlns:th="http://www.w3.org/1999/xhtml" alugn="center">에러페이지</h4>
+
+<div th:if="${status == 404}" align="center">
+    <img src="https://hdwspring.s3.ap-northeast-2.amazonaws.com/test/고양이error페이지.jpg">
+</div>
+<div align="center">
+<p th:text ="${status}"></p>
+<p th:text ="${error}"></p>
+<p th:text ="${path}"></p>
+<p th:text ="${message}"></p>
+<p th:text ="${exception}"></p>
+<a href="/">메인페이지로 돌아가기</a>
+</div>

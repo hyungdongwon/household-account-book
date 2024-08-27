@@ -1,0 +1,206 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+}
+
+.header {
+  padding: 20px;
+  background-color: #ecdcff;
+  color: #7551a0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed; /* Fixed position to keep header at the top */
+  width: 100%; /* Full width */
+  top: 0; /* Stick to the top */
+  left: 0;
+  z-index: 1000; /* Ensure it's above other content */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  overflow: hidden; /* Hide overflowing content */
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 36px;
+  white-space: nowrap; /* Prevent text from wrapping */
+  text-overflow: ellipsis; /* Add '...' to the end of overflowing text */
+}
+
+.header .auth-links {
+  display: flex;
+  gap: 15px;
+}
+
+.header .auth-links a {
+  text-decoration: none;
+  color: #7551a0;
+  font-weight: bold;
+}
+
+.header .auth-links a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  display: flex;
+  margin-top: 80px; /* Adjust margin to account for header height */
+  height: calc(100vh - 80px); /* Adjust height to fit within viewport minus header */
+  overflow: hidden; /* Hide overflow to keep layout intact */
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #f8f8f8;
+  border-right: 1px solid #dcdcdc;
+  padding: 20px;
+  overflow-y: auto; /* Enable vertical scroll if content overflows */
+}
+
+.sidebar h1 {
+  font-size: 24px;
+  color: #7551a0;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  margin: 10px 0;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar ul li a:hover {
+  text-decoration: underline;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Enable vertical scroll if content overflows */
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.content-header .nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.content-header .nav-links a {
+  text-decoration: none;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.content-header .nav-links a.active,
+.content-header .nav-links a.selected {
+  background-color: #7551a0;
+  color: white;
+  font-weight: bold;
+}
+
+.nav-buttons button {
+  background: #f5f5f5;
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.nav-buttons button:hover {
+  background: #e0e0e0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #dcdcdc;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f0f0;
+}
+
+td input[type="date"],
+td input[type="text"],
+td select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.action-buttons button {
+  padding: 10px 20px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+    a{
+        text-decoration: none;
+        color: black;
+    }
+    .action-buttons .delete {
+      background-color: #f44336;
+      font-weight: bolder;
+      color: white;
+      border: none;
+      border-radius: 8px;
+        padding: 10px 20px;
+    }
+    .header {
+      padding: 20px;
+      background-color: #ecdcff;
+      color: #7551a0;
+      display: flex; /* flexbox 레이아웃을 사용하여 정렬 */
+      justify-content: space-between; /* 요소들을 양쪽 끝으로 배치 */
+      align-items: center; /* 수직 가운데 정렬 */
+    }
+    .header .auth-links {
+      display: flex; /* 링크들을 가로로 배치 */
+      gap: 15px; /* 링크 사이의 간격 */
+    }
+
+    .header .auth-links a {
+      text-decoration: none;
+      color: #7551a0;
+      font-weight: bold;
+    }
+
+    .header .auth-links a:hover {
+      text-decoration: underline;
+    }

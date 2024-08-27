@@ -1,0 +1,29 @@
+
+<h1 th:fragment="title">
+    가계부
+</h1>
+
+
+
+<div th:fragment="header">
+    <h1>가계부</h1>
+    <div class="auth-links" sec:authorize="isAnonymous()">
+        <a href="/member/join">회원가입</a>
+        <a href="/login">로그인</a>
+    </div>
+    <div class="auth-links" sec:authorize="isAuthenticated()">
+        <span sec:authentication="principal.memberName"></span>
+        <a href="#" onclick="document.getElementById('logout').submit();">로그아웃</a>
+        <a href="#" onclick="window.location.href='/member/mypage'">마이페이지</a>
+    </div>
+</div>
+
+
+
+<div th:fragment="sidebar">
+    <ul>
+        <li><a href="/account/calender">달력</a></li>
+        <li><a href="/income/list">수입/지출</a></li>
+        <li><a href="/income/report?option=bar&value=1">보고서</a></li>
+    </ul>
+</div>

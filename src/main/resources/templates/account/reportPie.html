@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>In & Out</title>
+    <link rel="stylesheet" href="/menu/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <style>
+    .custom-radio {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+    }
+    input[type="radio"]{
+        width:30px;
+        height:20px;
+        border:1px;
+
+    }
+   #pieChart {
+        width: 80%;  /* 부모 요소의 80% 너비 */
+        max-width: 500px;  /* 최대 너비를 600px로 설정 */
+        max-height: 500px;   /* 높이 400px로 설정 */
+        }
+  </style>
+</head>
+<body>
+<form id="logout" action="/logout" method="post">
+</form>
+<div class="header">
+    <h1>가계부</h1>
+    <div class="auth-links" sec:authorize="isAnonymous()">
+        <a href="/member/join">회원가입</a>
+        <a href="/login">로그인</a>
+    </div>
+    <div class="auth-links" sec:authorize="isAuthenticated()">
+        <a href="#" onclick="document.getElementById('logout').submit();">로그아웃</a>
+    </div>
+</div>
+<div class="container">
+    <div class="sidebar">
+        <ul>
+            <li><a href="/account/calender">달력</a></li>
+            <li><a href="/income/list">수입/지출</a></li>
+            <li><a href="/account/report">보고서</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h3>막대형</h3>
+        <label class="custom-radio">
+            <input type="radio" name="option" value="1" th:checked = "${value == '1'}" onclick="navigateToPage(this)">
+            수입
+        </label>
+        <label class="custom-radio">
+            <input type="radio" name="option" value="2" th:checked = "${value == '2'}" onclick="navigateToPage(this)">
+            지출
+        </label>
+        <h3>파이형</h3>
+        <label class="custom-radio">
+            <input type="radio" name="option" value="3" th:checked = "${value == '3'}" onclick="navigateToPage(this)">
+            수입
+        </label>
+        <label class="custom-radio">
+            <input type="radio" name="option" value="4" th:checked = "${value == '4'}" onclick="navigateToPage(this)">
+            지출
+        </label>
+        <div class="content-header">
+            <h2 id="currentMonthYear" th:text="${searchedDate}"></h2>
+            <div class="nav-buttons">
+                <input type="hidden" id="value" th:value="${value}">
+                <button onclick="changeMonth(-1)">&lt;</button>
+                <button onclick="changeMonth(1)">&gt;</button>
+            </div>
+            <h2>보고서(파이형)</h2>
+        </div>
+        <div class="calendar">
+            <canvas id="pieChart"></canvas>
+
+        </div>
+    </div>
+</div>
+<script>
+     function navigateToPage(radio) {
+            if (radio.checked) {
+                if (radio.value === "1") {
+                    location.href = "/income/report?option=bar&value=1";
+                } else if (radio.value === "2") {
+                    location.href = "/outcome/report?option=bar&value=2";
+                } else if (radio.value === "3") {
+                    location.href = "/income/report?option=pie&value=3";
+                } else if (radio.value === "4") {
+                    location.href = "/outcome/report?option=pie&value=4";
+                }
+            }
+        }
+
+</script>
+
+<script th:inline="javascript">
+      var priceArray = [[${price}]];
+      console.log(priceArray);
+
+      var data = [];
+      for (var i = 0; i < priceArray.length; i++) {
+          data.push(priceArray[i]);
+      }
+
+      var categoryNameArray = [[${categoryName}]];
+      console.log(categoryNameArray);
+
+      var labels = [];
+      for (var i = 0; i < categoryNameArray.length; i++) {
+          labels.push(categoryNameArray[i]);
+      }
+</script>
+
+<script>
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+             labels: labels,
+            datasets: [{
+                label: '지출 비율',
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            let value = tooltipItem.raw;
+                            return value.toLocaleString() + ' 원';
+                        }
+                    }
+                },
+            datalabels: {
+                formatter: (value, context) => {
+                    let sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    let percentage = (value * 100 / sum).toFixed(2) + '%';
+                    return percentage;
+                },
+                color: '#555',
+                anchor: 'center',
+                align: 'center',
+                font: {
+                    weight: 'bold',
+                    size: 16,
+                }
+            }
+        }
+    },
+    plugins: [ChartDataLabels]
+    });
+</script>
+
+<script>
+ let today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth() + 1;
+
+    // 현재 년월을 표시하는 함수
+    function updateMonthYearDisplay() {
+        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+        document.getElementById('currentMonthYear').innerText = `${currentYear}년 ${monthNames[currentMonth - 1]}`;
+    }
+
+    // 월을 변경하는 함수
+    function changeMonth(delta) {
+        currentMonth += delta;
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        } else if (currentMonth < 1) {
+            currentMonth = 12;
+            currentYear--;
+        }
+        updateMonthYearDisplay();
+
+        const formattedMonth = currentMonth.toString().padStart(2, '0');
+        const regDt = `${currentYear}-${formattedMonth}`;
+        const value = document.getElementById('value').value;
+        // URL에 변경된 regDt 값을 반영하여 페이지 이동
+        if(value == "3"){
+             location.href = `/income/report?option=pie&value=${value}&regDt=${regDt}`;
+        } else if(value == "4"){
+            location.href = `/outcome/report?option=pie&value=${value}&regDt=${regDt}`;
+        }
+    }
+
+    // 페이지 로드 시 호출되는 함수
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchedDate = /*[[${searchedDate}]]*/ '[[${searchedDate}]]';
+        if (searchedDate) {
+            const [year, month] = searchedDate.split('-');
+            currentYear = parseInt(year, 10);
+            currentMonth = parseInt(month, 10);
+        }
+        updateMonthYearDisplay();
+    });
+</script>
+</body>
+</html>

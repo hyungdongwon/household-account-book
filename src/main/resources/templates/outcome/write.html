@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>In & Out</title>
+    <link rel="stylesheet" href="/menu/style.css">
+</head>
+<body>
+<div class="header" th:include=".common/menu :: header"></div>
+
+<div class="container">
+
+    <div class="sidebar" th:include=".common/menu :: sidebar"></div>
+    <div class="content">
+        <div class="content-header">
+            <h2>지출</h2>
+        </div>
+        <form name = "outcomeForm">
+            <table>
+                <thead>
+                <tr>
+                    <th>수정/삭제 체크</th>
+                    <th>날짜</th>
+                    <th>분류</th>
+                    <th>사용내역</th>
+                    <th>금액</th>
+                    <th>메모</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="outcome: ${outcomeDTOList}">
+                    <td><input type="checkbox" name="outcomeId" th:value="${outcome.outcomeId}" ></td>
+                    <td th:text="${outcome.regDt}"></td>
+                    <td th:text="${outcome.outcomeCategoryName}"></td>
+                    <td th:text="${outcome.outcomeContent}"></td>
+                    <td th:text="${outcome.price}"></td>
+                    <td th:text="${outcome.memo}"></td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td><input type="date" name="regDt"></td>
+                    <td>
+                        <select name="outcomeCategoryId">
+                            <option value="11">주거/통신</option>
+                            <option value="22">식비</option>
+                            <option value="33">의복/미용</option>
+                            <option value="44">교통</option>
+                            <option value="55">건강/문화</option>
+                            <option value="66">교육</option>
+                            <option value="77">저축</option>
+                            <option value="88">보험</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="outcomeContent"></td>
+                    <td><input type="text" name="price"></td>
+                    <td><input type="text" name="memo"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="action-buttons">
+                <button class="save" onclick="save();">저장</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function save(){
+        document.outcomeForm.action = "/outcome/write";
+        document.outcomeForm.method = "post";
+        document.outcomeForm.submit();
+    }
+
+    function update() {
+    const checkboxes = document.querySelectorAll('input[name="outcomeId"]');
+    let outcomeId = null;
+
+    for (let checkbox of checkboxes) {
+        if (checkbox.checked) {
+            outcomeId = checkbox.value;
+            break;
+        }
+    }
+
+    if (outcomeId) {
+        location.href = "/outcome/update?outcomeId=${outcomeId}";
+    } else {
+        alert('체크된 항목이 없습니다.');
+    }
+  }
+
+   document.addEventListener('DOMContentLoaded', function () {
+    const searchedDate = /*[[${searchedDate}]]*/ '[[${searchedDate}]]'; // 서버에서 전달된 searchedDate를 가져옴
+
+    if (searchedDate) {
+      const [year, month] = searchedDate.split('-');
+      currentYear = parseInt(year, 10);
+      currentMonth = parseInt(month, 10);
+    }
+
+    updateMonthYearDisplay();
+  });
+
+  function updateMonthYearDisplay() {
+    const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+    document.getElementById('currentMonthYear').innerText = `${monthNames[currentMonth - 1]} ${currentYear}`;
+    
+  }
+</script>
+</body>
+</html>

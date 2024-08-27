@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>In & Out</title>
+    <link rel="stylesheet" href="/menu/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .action-buttons .save {
+          background-color: white;
+          font-weight: bolder;
+
+          color: black;
+          border: 2px solid grey;
+            border-radius: 8px;
+            padding: 10px 20px;
+
+        }
+        .action-buttons .update {
+          background-color: white;
+          font-weight: bolder;
+          color: black;
+          border: 2px solid grey;
+            border-radius: 8px;
+            padding: 10px 20px;
+
+        }
+    </style>
+</head>
+<body>
+<form id="logout" action="/logout" method="post">
+</form>
+
+<div class="header" th:include=".common/menu :: header"></div>
+
+<div class="container">
+
+    <div class="sidebar" th:include=".common/menu :: sidebar"></div>
+
+    <div class="content">
+        <div class="content-header">
+            <div class="nav-links">
+                <a href="/income/list" id="incomeLink">수입</a>
+                <a href="/outcome/list" id="outcomeLink">지출</a>
+            </div>
+
+            <h2 id="currentMonthYear" th:text="${searchedDate}"></h2>
+            <div class="nav-buttons">
+                <button onclick="changeMonth(-1)">&lt;</button>
+                <button onclick="changeMonth(1)">&gt;</button>
+            </div>
+            <div class="nav-buttons">
+                <form name="searchForm">
+                    <input type="hidden" name="regDt">
+                </form>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>수정/삭제 체크</th>
+                <th>날짜</th>
+                <th>수입내역</th>
+                <th>금액</th>
+                <th>메모</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="income: ${incomeDTOList}">
+                <td><input type="checkbox" name="incomeId" th:value="${income.incomeId}" ></td>
+                <td th:text="${income.regDt}"></td>
+                <td th:text="${income.incomeContent}"></td>
+                <td th:text="${income.price}"></td>
+                <td th:text="${income.memo}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="action-buttons">
+            <button class="save" onclick="save();">추가</button>
+            <button class="update" onclick="incomeUpdate();">수정</button>
+            <button class="delete" onclick="incomeDelete();">삭제</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+ function save(){
+ const searchData = document.searchForm.regDt.value;  // 예: regDt에 입력된 값을 가져옴
+      location.href = `/income/write?regDt=${encodeURIComponent(searchData)}`;
+  }
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth() + 1;
+  let currentMonth = month;
+  let currentYear = year;
+
+  function updateMonthYearDisplay() {
+    const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+    document.getElementById('currentMonthYear').innerText = `${monthNames[currentMonth - 1]} ${currentYear}`;
+    const formattedMonth = currentMonth.toString().padStart(2, '0');
+    document.searchForm.regDt.value = `${currentYear}-${formattedMonth}`;
+
+  }
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 12) {
+      currentMonth = 1;
+      currentYear++;
+    } else if (currentMonth < 1) {
+      currentMonth = 12;
+      currentYear--;
+    }
+    updateMonthYearDisplay();
+
+    const formattedMonth = currentMonth.toString().padStart(2, '0');
+    const formattedDate = `${currentYear}-${formattedMonth}`;
+    const type = /*[[${type}]]*/ '[[${type}]]'; // 서버에서 전달된 type을 가져옴
+
+    if (type === 'income') {
+        location.href = `/income/list?regDt=${formattedDate}`;
+    } else if (type === 'outcome') {
+        location.href = `/outcome/list?regDt=${formattedDate}`;
+    }
+
+  }
+
+  function incomeUpdate() {
+    const checkboxes = document.querySelectorAll('input[name="incomeId"]');
+    let incomeId = null;
+
+    for (let checkbox of checkboxes) {
+      if (checkbox.checked) {
+        incomeId = checkbox.value;
+        break;
+      }
+    }
+
+    if (incomeId) {
+      const searchData = document.searchForm.regDt.value;  // 예: regDt에 입력된 값을 가져옴
+        location.href = `/income/update/${incomeId}?regDt=${encodeURIComponent(searchData)}`;
+    } else {
+      alert('체크된 항목이 없습니다.');
+    }
+  }
+
+  function incomeDelete() {
+    const checkboxes = document.querySelectorAll('input[name="incomeId"]');
+    let incomeId = null;
+
+    for (let checkbox of checkboxes) {
+      if (checkbox.checked) {
+        incomeId = checkbox.value;
+        break;
+      }
+    }
+
+    if (incomeId) {
+      const searchData = document.searchForm.regDt.value;  // 예: regDt에 입력된 값을 가져옴
+        location.href = `/income/delete/${incomeId}?regDt=${encodeURIComponent(searchData)}`;
+    } else {
+      alert('체크된 항목이 없습니다.');
+    }
+  }
+
+  function regDtSearch(){
+      document.searchForm.action = "/income/search";
+      document.searchForm.method = "post";
+      document.searchForm.submit();
+  }
+
+   // 페이지가 로드될 때 초기 표시 설정
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchedDate = /*[[${searchedDate}]]*/ '[[${searchedDate}]]'; // 서버에서 전달된 searchedDate를 가져옴
+    const type = /*[[${type}]]*/ '[[${type}]]'; // 서버에서 전달된 type을 가져옴
+
+    if (searchedDate) {
+      const [year, month] = searchedDate.split('-');
+      currentYear = parseInt(year, 10);
+      currentMonth = parseInt(month, 10);
+    }
+
+    updateMonthYearDisplay();
+
+    // URL을 기반으로 현재 활성 링크 설정
+    const currentPath = window.location.pathname;
+    if (type === 'income') {
+      document.getElementById('incomeLink').classList.add('selected');
+    } else if (type === 'outcome') {
+      document.getElementById('outcomeLink').classList.add('selected');
+    }
+  });
+
+  // 클릭 시 글자를 활성화된 상태로 변경
+  document.querySelectorAll('.nav-links a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.nav-links a').forEach(function(a) {
+        a.classList.remove('selected');
+      });
+      this.classList.add('selected');
+    });
+  });
+
+</script>
+</body>
+</html>

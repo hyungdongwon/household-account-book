@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>In & Out</title>
+    <link rel="stylesheet" href="/menu/style.css">
+</head>
+<body>
+<div class="header" th:include=".common/menu :: header"></div>
+
+<div class="container">
+
+    <div class="sidebar" th:include=".common/menu :: sidebar"></div>
+    <div class="content">
+        <div class="content-header">
+            <h2 th:text="${regDt}"></h2>
+        </div>
+        <form name = "updateForm">
+            <table>
+                <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>분류</th>
+                    <th>수입내역</th>
+                    <th>금액</th>
+                    <th>메모</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="income: ${incomeDTOList}">
+                    <div th:if="${income.incomeId == incomeId}">
+
+                        <td><input type="date" th:value="${income.regDt}" name="regDt"></td>
+                        <td>
+                            <select name="incomeCategoryId" th:value="${income.incomeCategoryName}" >
+                                <option value="11" th:selected="${income.incomeCategoryName == '주수입'}">주수입</option>
+                                <option value="22" th:selected="${income.incomeCategoryName == '부수입'}">부수입</option>
+                            </select>
+                        </td>
+                        <td><input type="text" th:value="${income.incomeContent}" name="incomeContent"></td>
+                        <td><input type="text" th:value="${income.price}" name="price"></td>
+                        <td><input type="text" th:value="${income.memo}" name="memo"></td>
+                    </div>
+
+                    <div th:unless="${income.incomeId == incomeId}">
+                        <td th:text="${income.regDt}"></td>
+                        <td th:text="${income.incomeCategoryName}"></td>
+                        <td th:text="${income.incomeContent}"></td>
+                        <td th:text="${income.price}"></td>
+                        <td th:text="${income.memo}"></td>
+                    </div>
+                </tr>
+                </tbody>
+            </table>
+            <div class="action-buttons">
+                <td><input type="hidden" th:value="${incomeId}" name="incomeId"></td>
+                <button class="update" onclick="update();">수정</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function update() {
+        document.updateForm.action = "/income/update";
+        document.updateForm.method = "post";
+        document.updateForm.submit();
+
+  }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>In & Out</title>
+    <link rel="stylesheet" href="/menu/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+    .custom-radio {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+    }
+    input[type="radio"]{
+        width:30px;
+        height:20px;
+        border:1px;
+
+    }
+    #barChart {
+        width: 80%;  /* 부모 요소의 80% 너비 */
+        max-width: 700px;  /* 최대 너비를 600px로 설정 */
+        max-height: 500px;   /* 높이 400px로 설정 */
+    }
+    #download_excel {
+        border: none; /* 테두리 제거 */
+        color: black; /* 흰색 글씨 */
+        padding: 10px 20px; /* 여백 */
+        text-align: center; /* 텍스트 중앙 정렬 */
+        text-decoration: none; /* 텍스트 밑줄 제거 */
+        font-size: 16px; /* 폰트 크기 */
+        cursor: pointer; /* 마우스 커서 모양 변경 */
+        border-radius: 12px; /* 둥근 모서리 */
+    }
+
+    #download_excel:hover {
+        background-color: white; /* 호버 시 배경색 변경 */
+        color: black; /* 호버 시 글자색 변경 */
+        border: 2px solid #4CAF50; /* 호버 시 테두리 추가 */
+    }
+
+  </style>
+</head>
+<body>
+<form id="logout" action="/logout" method="post">
+</form>
+<div class="header" th:include=".common/menu :: header"></div>
+
+<div class="container">
+
+    <div class="sidebar" th:include=".common/menu :: sidebar"></div>
+
+    <div class="content">
+            <h3>막대형</h3>
+            <label class="custom-radio">
+                <input type="radio" name="option" value="1" th:checked = "${value == '1'}" onclick="navigateToPage(this)">
+                수입
+            </label>
+            <label class="custom-radio">
+                <input type="radio" name="option" value="2" th:checked = "${value == '2'}" onclick="navigateToPage(this)">
+                지출
+            </label>
+            <h3>파이형</h3>
+            <label class="custom-radio">
+                <input type="radio" name="option" value="3" th:checked = "${value == '3'}" onclick="navigateToPage(this)">
+                수입
+            </label>
+            <label class="custom-radio">
+                <input type="radio" name="option" value="4" th:checked = "${value == '4'}" onclick="navigateToPage(this)">
+                지출
+            </label>
+        <div class="content-header">
+            <h2 id="currentMonthYear" th:text="${searchedDate}"></h2>
+            <div class="nav-buttons">
+                <input type="hidden" id="value" th:value="${value}">
+                <button onclick="changeMonth(-1)">&lt;</button>
+                <button onclick="changeMonth(1)">&gt;</button>
+            </div>
+        </div>
+        <div class="calendar">
+            <canvas id="barChart"></canvas>
+            <button id="download_excel">엑셀 다운로드(지출)</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+     function navigateToPage(radio) {
+            if (radio.checked) {
+                if (radio.value === "1") {
+                    location.href = "/income/report?option=bar&value=1";
+                } else if (radio.value === "2") {
+                    location.href = "/outcome/report?option=bar&value=2";
+                } else if (radio.value === "3") {
+                    location.href = "/income/report?option=pie&value=3";
+                } else if (radio.value === "4") {
+                    location.href = "/outcome/report?option=pie&value=4";
+                }
+            }
+        }
+</script>
+
+<script th:inline="javascript">
+      var priceArray = [[${price}]];
+      console.log(priceArray);
+
+      var data = [];
+      for (var i = 0; i < priceArray.length; i++) {
+          data.push(priceArray[i]);
+      }
+
+      var categoryNameArray = [[${categoryName}]];
+      console.log(categoryNameArray);
+
+      var labels = [];
+      for (var i = 0; i < categoryNameArray.length; i++) {
+          labels.push(categoryNameArray[i]);
+      }
+</script>
+
+<script>
+    const datasets = labels.map((label, index) => {
+    const colors = [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        // 필요한 만큼 색상을 추가하세요.
+    ];
+
+    const borderColors = [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        // 필요한 만큼 색상을 추가하세요.
+    ];
+
+    return {
+        label: `${label}: ${data[index]} 원`,  // 범례에 표시할 라벨과 데이터
+        data: [data[index]],  // 해당 카테고리의 데이터 값
+        backgroundColor: colors[index],  // 각 데이터 세트의 배경색
+        borderColor: borderColors[index],  // 각 데이터 세트의 테두리 색
+        borderWidth: 1
+    };
+});
+
+const ctx = document.getElementById('barChart').getContext('2d');
+const total = data.reduce((sum, value) => sum + value, 0);
+const barChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [''],  // 빈 배열을 사용하여 각 항목을 독립적으로 처리
+        datasets: datasets  // 각 데이터 세트를 포함한 배열
+    },
+    options: {
+        indexAxis: 'y',  // 가로 막대 그래프 설정
+        scales: {
+            x: {
+                beginAtZero: true
+            }
+        },
+        plugins: {
+            legend: {
+                display: true,  // 범례를 표시
+                position: 'right',  // 범례의 위치를 조정 가능 (top, bottom, left, right)
+                labels: {
+                    boxWidth: 20,  // 범례 아이콘의 크기
+                    padding: 15  // 범례 라벨의 패딩
+                }
+            },
+            datalabels: {
+                anchor: 'center',
+                align: 'center',
+                formatter: function(value) {
+                    return `${((value / total) * 100).toFixed(2)}%`;  // 퍼센트 값을 계산하여 표시
+                },
+                color: '#555',  // 퍼센트 텍스트 색상
+                font: {
+                    weight: 'bold'
+                }
+            }
+        }
+    },
+    plugins: [ChartDataLabels]  // 플러그인 활성화
+});
+
+</script>
+
+<script>
+    let today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth() + 1;
+    let regDt = `${currentYear}-${String(currentMonth).padStart(2, '0')}`; // 초기 regDt 설정
+
+    // 현재 년월을 표시하는 함수
+    function updateMonthYearDisplay() {
+    const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+    document.getElementById('currentMonthYear').innerText = `${currentYear}년 ${monthNames[currentMonth - 1]}`;
+    }
+
+    // 월을 변경하는 함수
+    function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 12) {
+        currentMonth = 1;
+        currentYear++;
+    } else if (currentMonth < 1) {
+        currentMonth = 12;
+        currentYear--;
+    }
+    updateMonthYearDisplay();
+
+    const formattedMonth = currentMonth.toString().padStart(2, '0');
+    regDt = `${currentYear}-${formattedMonth}`; // regDt 값을 업데이트
+
+    const value = document.getElementById('value').value;
+    // URL에 변경된 regDt 값을 반영하여 페이지 이동
+    if (value == "1") {
+        location.href = `/income/report?option=bar&value=${value}&regDt=${regDt}`;
+    } else if (value == "2") {
+        location.href = `/outcome/report?option=bar&value=${value}&regDt=${regDt}`;
+    }
+    }
+
+    // 페이지 로드 시 호출되는 함수
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchedDate = /*[[${searchedDate}]]*/ '[[${searchedDate}]]';
+        if (searchedDate) {
+            const [year, month] = searchedDate.split('-');
+            currentYear = parseInt(year, 10);
+            currentMonth = parseInt(month, 10);
+            regDt = `${currentYear}-${String(currentMonth).padStart(2, '0')}`; // 로드 시 regDt 값 업데이트
+        }
+        updateMonthYearDisplay();
+
+        const value = document.getElementById('value').value;
+        const downloadButton = document.getElementById('download_excel');
+        if (value === "2") {
+            downloadButton.style.display = "inline-block";
+        } else {
+            downloadButton.style.display = "none";
+        }
+    });
+
+    $(document).ready(function () {
+    $('#download_excel').on('click', function () {
+        location.href = `/excel/download?regDt=${regDt}`;  // regDt 값을 URL에 반영
+    });
+    });
+
+</script>
+</body>
+</html>

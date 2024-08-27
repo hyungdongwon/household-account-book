@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>In & Out</title>
+    <link rel="stylesheet" href="/menu/style.css">
+</head>
+<body>
+<div class="header" th:include=".common/menu :: header"></div>
+
+<div class="container">
+
+    <div class="sidebar" th:include=".common/menu :: sidebar"></div>
+    <div class="content">
+        <div class="content-header">
+            <h2 th:text="${regDt}"></h2>
+        </div>
+        <form name = "updateForm">
+            <table>
+                <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>분류</th>
+                    <th>사용내역</th>
+                    <th>금액</th>
+                    <th>메모</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="outcome: ${outcomeDTOList}">
+                    <div th:if="${outcome.outcomeId == outcomeId}">
+
+                        <td><input type="date" th:value="${outcome.regDt}" name="regDt"></td>
+                        <td>
+                            <select name="outcomeCategoryId">
+                                <option value="11" th:selected="${outcome.outcomeCategoryName == '주거/통신'}">주거/통신</option>
+                                <option value="22" th:selected="${outcome.outcomeCategoryName == '식비'}">식비</option>
+                                <option value="33" th:selected="${outcome.outcomeCategoryName == '의복/미용'}">의복/미용</option>
+                                <option value="44" th:selected="${outcome.outcomeCategoryName == '교통'}">교통</option>
+                                <option value="55" th:selected="${outcome.outcomeCategoryName == '건강/문화'}">건강/문화</option>
+                                <option value="66" th:selected="${outcome.outcomeCategoryName == '교육'}">교육</option>
+                                <option value="77" th:selected="${outcome.outcomeCategoryName == '저축'}">저축</option>
+                                <option value="88" th:selected="${outcome.outcomeCategoryName == '보험'}">보험</option>
+                            </select>
+                        </td>
+                        <td><input type="text" th:value="${outcome.outcomeContent}" name="outcomeContent"></td>
+                        <td><input type="text" th:value="${outcome.price}" name="price"></td>
+                        <td><input type="text" th:value="${outcome.memo}" name="memo"></td>
+                    </div>
+
+                    <div th:unless="${outcome.outcomeId == outcomeId}">
+                        <td th:text="${outcome.regDt}"></td>
+                        <td th:text="${outcome.outcomeCategoryName}"></td>
+                        <td th:text="${outcome.price}"></td>
+                        <td th:text="${outcome.memo}"></td>
+                    </div>
+                </tr>
+                </tbody>
+            </table>
+            <div class="action-buttons">
+                <td><input type="hidden" th:value="${outcomeId}" name="outcomeId"></td>
+                <button class="update" onclick="update();">수정</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function update() {
+        document.updateForm.action = "/outcome/update";
+        document.updateForm.method = "post";
+        document.updateForm.submit();
+
+  }
+
+
+</script>
+</body>
+</html>

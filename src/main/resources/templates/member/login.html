@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+
+        }
+        .header {
+            padding: 20px;
+            background-color: #ecdcff;
+            color: #7551a0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        input{
+            width: 300px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+        #title{
+            font-weight: bolder;
+        }
+        #login,#join{
+            width: 155px;
+            height: 50px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 5px;
+            background-color: rgb(0, 68, 255);
+            color: white;
+            font-weight: bolder;
+
+        }
+        #login,#join:hover {
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+         /* 구글 로그인 버튼 스타일 */
+        .google-login-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 300px;
+            height: 40px; /* 기존 로그인 버튼과 높이 맞추기 */
+            border-radius: 5px;
+            background-color: #4285F4;
+            color: white;
+            font-weight: bold;
+            font-size: 16px; /* 폰트 크기 조정 */
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px 0;
+        }
+        .google-login-button:hover {
+            background-color: #357ae8;
+        }
+        .google-login-button img {
+            width: 300px; /* 이미지 너비 조정 */
+            height: 40px; /* 버튼과 동일한 높이로 설정 */
+            margin-right: 10px;
+            vertical-align: middle; /* 이미지 수직 정렬 */
+        }
+
+        #emailVerifyButton,#emailTokenVerifyButton {
+            width: 300px; /* Match the width of email input */
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            background-color: #ecdcff;
+            color: #7551a0;
+            cursor: pointer;
+            display: block;
+            margin-top: 10px; /* Space between email input and button */
+        }
+
+        #emailTokenInput {
+            width: 300px; /* Match the width of email input */
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 5px;
+            box-sizing: border-box;
+            display: none; /* Initially hidden */
+            margin-top: 10px; /* Space between verify button and token input */
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="header">
+    <h1>가계부</h1>
+</div>
+<br><br><br>
+<form method="POST" action="/login" id="loginForm">
+    <table align="center" >
+        <tr>
+            <td align="center">
+                <span id="title">가계부 로그인</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <br><input type="text" placeholder="아이디(이메일)" name="username">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <br><input type="password" placeholder="비밀번호"name="password"><br>
+
+                <div th:if="${param.error}" class="error">
+                    아이디 또는 비밀번호가 틀립니다.
+                </div>
+                <div th:if="${count < 5}">
+                    <span th:text="${loginCount}" class="error"></span>
+                </div>
+                <div th:if="${count == 5}" class="error">
+                    로그인 5회실패 이메일 인증코드 입력 후 로그인해주세요.
+                </div>
+            </td>
+        </tr>
+        <tr align="center">
+            <td>
+                <br><button id="login" type="submit">로그인</button>
+                <button type="button" id="join" onclick="location.href='/member/join'">회원가입</button>
+            </td>
+        </tr>
+        <tr align="center">
+            <td>
+                <a href="/oauth2/authorization/google" class="google-login-button">
+                    Google Login
+                </a>
+            </td>
+        </tr><br>
+        <tr>
+            <td>
+                <div th:if="${count == 5}">
+                    <button type="button" id="emailVerifyButton">이메일 인증</button>
+                    <br><input type="text" placeholder="이메일로 받은 인증 코드를 입력하세요." name="emailTokenInput" id="emailTokenInput" style="display:none;"/>
+                    <br><div id="emailVerifyMessage" class="emailError"></div>
+                    <button type="button" id="emailTokenVerifyButton" style="display:none;">인증코드 작성완료</button>
+                </div>
+            </td>
+        </tr>
+        <input type="hidden" name="email" id="email" th:value="${email}"/>
+    </table>
+</form>
+
+<script>
+    $(document).ready(function() {
+         $('#emailVerifyButton').on('click', function() {
+             var email = $('#email').val().trim();
+             $.ajax({
+                 url: '/member/email-verify2',
+                 type: 'POST',
+                 contentType: 'application/x-www-form-urlencoded',
+                 data: { email: email },
+                 success: function(response) {
+                     $('#emailVerifyMessage').text('이메일 인증 링크가 발송되었습니다. 메일함을 확인해 주세요.');
+                     $('#emailVerifyMessage').css('color', 'green');
+                     $('#emailError').text(''); // 이전 에러 메시지 초기화
+
+                     $('#emailTokenInput').show(''); //이메일토큰 입력창 드러내기
+                     $('#emailTokenVerifyButton').show();
+                 },
+                 error: function(xhr) {
+                     var errorResponse = xhr.responseJSON;
+
+                     $('#emailVerifyMessage').text('');
+                     $('#emailTokenInput').hide('');
+                     if (errorResponse && errorResponse.email) {
+                        $('#emailVerifyMessage').text(errorResponse.email);
+                     } else {
+                        $('#emailVerifyMessage').text('이메일 인증 중 오류가 발생했습니다.');
+                     }
+                 }
+             });
+         });
+     });
+
+        //이메일 인증 코드 확인 버튼 클릭 시
+        $('#emailTokenVerifyButton').on('click', function() {
+            var emailToken = $('#emailTokenInput').val().trim();
+            var email = $('#email').val().trim();
+            $.ajax({
+                url: '/member/email-token-verify',
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { token: emailToken, email: email },
+                success: function(response) {
+                    $('#emailVerifyMessage').text('이메일 인증에 성공했습니다.');
+                    $('#emailVerifyMessage').css('color', 'green');
+                    $('.error').text('');
+                },
+                error: function(xhr) {
+                    var errorResponse = xhr.responseJSON;
+                    if (errorResponse && errorResponse.token) {
+                        $('#emailVerifyMessage').text(errorResponse.token);
+                    } else {
+                        $('#emailVerifyMessage').text('인증 코드 확인 중 오류가 발생했습니다.');
+                    }
+                    $('#emailVerifyMessage').css('color', 'red');
+                }
+            });
+        });
+
+        // URL의 쿼리 파라미터를 읽는 함수
+        function getQueryParam(param) {
+            let urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // URL에서 특정 쿼리 파라미터 제거 함수
+        function removeQueryParam(param) {
+            let url = new URL(window.location.href);
+            url.searchParams.delete(param);
+            window.history.replaceState({}, document.title, url.pathname);
+        }
+
+        // 페이지가 로드되면 실행되는 스크립트
+        window.onload = function() {
+            let error = getQueryParam('error');
+            if (error === 'unauthorized') {
+                alert('로그인이 필요한 페이지입니다.');
+                removeQueryParam('error');  // 경고창이 뜬 후 쿼리 파라미터를 제거합니다.
+            }
+        };
+</script>
+</body>
+</html>

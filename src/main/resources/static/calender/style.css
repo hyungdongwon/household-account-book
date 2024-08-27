@@ -1,0 +1,144 @@
+.calendar {
+    width: 900px; /* 달력의 너비를 조정 */
+    background-color: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden; /* 경계를 넘어가는 부분을 숨김 */
+}
+
+.header1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px; /* 패딩 추가 */
+    background-color: #f7f7f7; /* 연한 회색 배경 */
+    border-bottom: 1px solid #dddddd; /* 하단 테두리 */
+}
+
+.year-month {
+    font-size: 24px; /* 글자 크기 조정 */
+    font-weight: bold; /* 글자 굵게 */
+}
+
+.nav {
+    display: flex;
+}
+
+.nav-btn {
+    width: 40px; /* 버튼 너비 조정 */
+    height: 40px; /* 버튼 높이 조정 */
+    border: none;
+    font-size: 18px;
+    background-color: #ffffff;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 5px; /* 버튼 사이의 간격 */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.go-today {
+    width: 80px;
+}
+
+.days {
+    display: flex;
+    background-color: #f7f7f7;
+    padding: 10px 0; /* 패딩 추가 */
+    border-bottom: 1px solid #dddddd;
+}
+
+.day {
+    width: calc(100% / 7);
+    text-align: center;
+    color: #777777;
+    font-weight: bold;
+}
+
+.dates {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px; /* 패딩 추가 */
+}
+
+.date {
+    width: calc(100% / 7 - 10px); /* 양쪽 간격을 위한 너비 조정 */
+    height: 100px; /* 날짜 셀 높이 조정 */
+    padding: 10px;
+    text-align: right;
+    border: 1px solid #dddddd;
+    box-sizing: border-box;
+    position: relative; /* 위치 조정 */
+    margin: 10px 5px; /* 위아래 및 양쪽 간격 추가 */
+    cursor: pointer; /* 포인터 커서 */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.date:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+}
+
+.date .day-number {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 14px;
+    color: #333333;
+}
+
+.date.this:hover .day-number {
+    color: #000000; /* 마우스를 올렸을 때 숫자 색상 변경 */
+}
+
+.day:nth-child(7n + 1),
+.date:nth-child(7n + 1) .day-number {
+    color: #D13E3E;
+}
+
+.day:nth-child(7n),
+.date:nth-child(7n) .day-number {
+    color: #396EE2;
+}
+
+.other {
+    opacity: 0.3;
+}
+
+.today {
+    background-color: #ffebcd; /* 연한 살색 배경 */
+}
+.modal {
+    display: none; /* 처음에는 보이지 않음 */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

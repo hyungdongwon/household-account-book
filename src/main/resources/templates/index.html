@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/XSL/Transform" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>가계부 메인</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header {
+            width: 100%;
+            padding: 20px;
+            background-color: #ecdcff;
+            color: #7551a0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+            margin-top: 20px; /* 헤더 아래 여백 추가 */
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #004999;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        ul li {
+            margin: 10px 0;
+        }
+
+        ul li a {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #0066cc;
+            color: white;
+            display: block;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        ul li a:hover {
+            background-color: #004999;
+        }
+
+        .logout-btn {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+<!-- 헤더 -->
+<div class="header">
+    <h1>가계부</h1>
+</div>
+
+<!-- 콘텐츠 컨테이너 -->
+<div class="container">
+    <!-- 로그인하지 않은 사용자에게만 보이는 섹션 -->
+    <div sec:authorize="isAnonymous()">
+        <h2>환영합니다!</h2>
+        <p>가계부를 사용하려면 로그인이 필요합니다.</p>
+        <a href="/login">로그인</a>
+        <a href="/member/join">회원가입</a>
+    </div>
+    <!-- 로그인한 사용자에게만 보이는 섹션 -->
+    <div sec:authorize="isAuthenticated()">
+        <h2>가계부 메인</h2>
+        <p>환영합니다, <span sec:authentication="principal.memberName"></span>님!</p>
+        <button class="logout-btn" onclick="document.getElementById('logout').submit();">로그아웃</button>
+        <p>유저 권한: <span sec:authentication="principal.authorities"></span></p>
+
+        <!-- 가계부 기능 링크 -->
+        <h3>가계부 관리</h3>
+        <ul>
+            <li><a href="/income/list">수입 목록</a></li>
+            <li><a href="/outcome/list">지출 목록</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- 로그아웃 폼 -->
+<form id="logout" action="/logout" method="post"></form>
+</body>
+</html>
